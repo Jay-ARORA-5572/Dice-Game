@@ -239,3 +239,12 @@ function init() {
 }
 
 init();
+
+// ----- PWA: register service worker for offline support / installability -----
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("service-worker.js").catch((err) => {
+      console.warn("Service worker registration failed:", err);
+    });
+  });
+}
