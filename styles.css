@@ -1,41 +1,250 @@
+:root {
+  --bg-color: #393E46;
+  --text-color: #EEEEEE;
+  --accent-color: #4ECCA3;
+  --shadow-color: #232931;
+  --btn-bg: #4ECCA3;
+  --btn-text: #232931;
+  --btn-secondary-bg: transparent;
+  --btn-secondary-border: #4ECCA3;
+  --card-bg: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="light"] {
+  --bg-color: #F5F5F0;
+  --text-color: #232931;
+  --accent-color: #1F8A70;
+  --shadow-color: #cfcfc7;
+  --btn-bg: #1F8A70;
+  --btn-text: #ffffff;
+  --btn-secondary-bg: transparent;
+  --btn-secondary-border: #1F8A70;
+  --card-bg: rgba(0, 0, 0, 0.04);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  margin: 0;
+  min-height: 100vh;
+}
+
 .container {
   width: 70%;
   margin: auto;
   text-align: center;
+  padding-top: 20px;
+}
+
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--accent-color);
+  color: var(--text-color);
+  font-size: 1.4rem;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  cursor: pointer;
+  z-index: 10;
+}
+
+h1 {
+  margin: 30px 10px;
+  font-family: 'Lobster', cursive;
+  text-shadow: 5px 0 var(--shadow-color);
+  font-size: 5rem;
+  color: var(--accent-color);
+}
+
+.settings {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+  font-family: 'Indie Flower', cursive;
+  color: var(--text-color);
+  font-size: 1.3rem;
+}
+
+.settings select {
+  font-family: 'Indie Flower', cursive;
+  font-size: 1.1rem;
+  margin-left: 8px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--accent-color);
+  background: var(--card-bg);
+  color: var(--text-color);
+}
+
+.players {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 40px;
+  flex-wrap: wrap;
 }
 
 .dice {
   text-align: center;
   display: inline-block;
-
+  min-width: 140px;
 }
 
-body {
-  background-color: #393E46;
-}
-
-h1 {
-  margin: 30px;
-  font-family: 'Lobster', cursive;
-  text-shadow: 5px 0 #232931;
-  font-size: 8rem;
-  color: #4ECCA3;
+.dice-row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 p {
-  font-size: 2rem;
-  color: #4ECCA3;
+  font-size: 1.6rem;
+  color: var(--accent-color);
   font-family: 'Indie Flower', cursive;
+  margin: 0 0 10px;
 }
 
 img {
-  width: 80%;
+  width: 90px;
+  max-width: 28vw;
+}
+
+.rolling {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%   { transform: rotate(0deg) scale(1); }
+  20%  { transform: rotate(-15deg) scale(1.05); }
+  40%  { transform: rotate(12deg) scale(0.95); }
+  60%  { transform: rotate(-10deg) scale(1.05); }
+  80%  { transform: rotate(8deg) scale(0.97); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+
+.scoreboard {
+  margin-top: 24px;
+  font-family: 'Indie Flower', cursive;
+  font-size: 1.6rem;
+  color: var(--text-color);
+}
+
+.controls {
+  margin: 24px 0;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  font-family: 'Indie Flower', cursive;
+  font-size: 1.3rem;
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: 2px solid var(--btn-bg);
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.btn:active {
+  transform: scale(0.96);
+}
+
+.btn.secondary {
+  background: var(--btn-secondary-bg);
+  color: var(--accent-color);
+  border-color: var(--btn-secondary-border);
+}
+
+.btn.text-btn {
+  background: none;
+  border: none;
+  text-decoration: underline;
+  color: var(--text-color);
+  font-size: 1rem;
+  padding: 4px;
+}
+
+.leaderboard {
+  margin: 30px auto 10px;
+  max-width: 420px;
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 16px;
+  color: var(--text-color);
+  font-family: 'Indie Flower', cursive;
+}
+
+.leaderboard h2 {
+  margin-top: 0;
+  color: var(--accent-color);
+  font-family: 'Lobster', cursive;
+  font-size: 1.8rem;
+}
+
+.leaderboard ol {
+  text-align: left;
+  padding-left: 20px;
+  font-size: 1.15rem;
+}
+
+.leaderboard li {
+  margin-bottom: 6px;
 }
 
 footer {
   margin-top: 5%;
-  color: #EEEEEE;
+  padding-bottom: 20px;
+  color: var(--text-color);
   text-align: center;
   font-family: 'Indie Flower', cursive;
+}
 
+/* Mobile responsiveness */
+@media (max-width: 600px) {
+  .container {
+    width: 92%;
+  }
+
+  h1 {
+    font-size: 2.6rem;
+    margin: 20px 10px;
+  }
+
+  .players {
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+
+  img {
+    width: 70px;
+    max-width: 22vw;
+  }
+
+  .settings {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .scoreboard {
+    font-size: 1.3rem;
+  }
+
+  .btn {
+    font-size: 1.1rem;
+    padding: 8px 18px;
+  }
 }

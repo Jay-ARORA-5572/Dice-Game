@@ -1,22 +1,44 @@
 # 🎲 Dicee
 
-A simple two-player dice-rolling game built with vanilla HTML, CSS, and JavaScript. Refresh the page to roll the dice for both players — whoever rolls higher wins!
+A two-player dice-rolling game built with vanilla HTML, CSS, and JavaScript — now with best-of-N tournaments, sound effects, and a persistent leaderboard.
 
-## How It Works
+![Dicee preview](assets/preview.png)
 
-- Each player is assigned a random dice roll (1–6) on page load.
-- The corresponding dice image is displayed for each player.
-- The game compares both rolls and announces the winner (or a draw) in the heading.
+> The image above is a static mockup of the UI. Swap it for a real screen recording (e.g. via [ScreenToGif](https://www.screentogif.com/) or [Kap](https://getkap.co/)) for the most accurate preview.
+
+## Features
+
+- 🎯 **Roll Dice button** — no more full-page refresh, rolls happen instantly with a shake animation
+- 🏆 **Best-of-N matches** — choose first to 1, 3, or 5 wins; a reset button starts a new match
+- 🔢 **Configurable dice count** — play with 1, 2, or 3 dice per player (totals are summed)
+- 🔊 **Sound effects** — a shake sound on roll and a chime on match win (generated with the Web Audio API, no audio files needed)
+- 📊 **Live score tracker** — shows each player's round wins throughout the match
+- 📋 **Local leaderboard** — match results persist across sessions via `localStorage`
+- 🌗 **Dark / light theme toggle** — preference is remembered on your next visit
+- 📱 **Responsive layout** — dice stack vertically and text scales down on mobile
 
 ## Project Structure
 
 ```
 Dice-Game/
-├── index.html      # Main HTML page
-├── styles.css       # Styling
-├── index.js         # Game logic (random rolls, winner detection)
-└── images/           # Dice face images (dice1.png - dice6.png)
+├── index.html        # Main HTML page
+├── styles.css         # Styling, theme variables, animations, responsive layout
+├── index.js           # Game logic: rolling, scoring, sound, leaderboard, theme
+├── favicon.svg         # Site favicon
+├── assets/
+│   ├── og-image.png    # Open Graph / social share preview image
+│   └── preview.png     # README preview screenshot
+└── images/
+    └── dice1.png … dice6.png   # Dice face images
 ```
+
+## How It Works
+
+1. Choose how many dice each player rolls, and how many round wins are needed to win the match.
+2. Click **Roll Dice** — both players' dice animate and land on a random result.
+3. Whoever has the higher total wins the round; round wins are tracked live.
+4. First to reach the target number of wins takes the match, and the result is saved to the leaderboard.
+5. Click **Reset Match** to play again, or **Clear leaderboard** to wipe saved history.
 
 ## Running Locally
 
@@ -25,13 +47,13 @@ Dice-Game/
    git clone https://github.com/Jay-ARORA-5572/Dice-Game.git
    ```
 2. Open `index.html` in your browser (no build step or server required).
-3. Refresh the page to roll again.
+3. Click **Roll Dice** to play.
 
 ## Tech Stack
 
 - HTML5
-- CSS3
-- Vanilla JavaScript
+- CSS3 (custom properties for theming, keyframe animations, media queries)
+- Vanilla JavaScript (Web Audio API for sound, `localStorage` for persistence)
 
 ## Credits
 

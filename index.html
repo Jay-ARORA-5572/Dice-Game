@@ -4,32 +4,83 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dicee</title>
+    <meta name="description" content="A two-player dice-rolling game with best-of-N tournaments, sound effects, and a local leaderboard.">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+    <!-- Open Graph / social preview -->
+    <meta property="og:title" content="Dicee 🎲">
+    <meta property="og:description" content="A two-player dice-rolling game with best-of-N tournaments, sound effects, and a local leaderboard.">
+    <meta property="og:image" content="assets/og-image.png">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Dicee 🎲">
+    <meta name="twitter:description" content="A two-player dice-rolling game with best-of-N tournaments, sound effects, and a local leaderboard.">
+    <meta name="twitter:image" content="assets/og-image.png">
+
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css?family=Indie+Flower|Lobster" rel="stylesheet">
-
   </head>
   <body>
 
+    <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark or light theme">🌙</button>
+
     <div class="container">
-      <h1>Refresh Me</h1>
+      <h1 id="heading">Roll the Dice!</h1>
 
-      <div class="dice">
-        <p>Player 1</p>
-        <img class="img1" src="images/dice6.png" alt="Dice Image">
+      <div class="settings">
+        <label>
+          Dice per player
+          <select id="dice-count">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+          </select>
+        </label>
+
+        <label>
+          First to
+          <select id="best-of">
+            <option value="1">1 win</option>
+            <option value="3" selected>3 wins</option>
+            <option value="5">5 wins</option>
+          </select>
+        </label>
       </div>
 
-      <div class="dice">
-        <p>Player 2</p>
-        <img class="img2" src="images/dice6.png" alt="Dice Image">
+      <div class="players">
+        <div class="dice player1">
+          <p>Player 1</p>
+          <div class="dice-row" id="dice-row-1"></div>
+        </div>
+
+        <div class="dice player2">
+          <p>Player 2</p>
+          <div class="dice-row" id="dice-row-2"></div>
+        </div>
       </div>
 
+      <div class="scoreboard">
+        <span id="match-score">Player 1: 0 &nbsp;|&nbsp; Player 2: 0</span>
+      </div>
+
+      <div class="controls">
+        <button id="roll-btn" class="btn">Roll Dice</button>
+        <button id="reset-btn" class="btn secondary">Reset Match</button>
+      </div>
+
+      <div class="leaderboard">
+        <h2>Leaderboard</h2>
+        <ol id="leaderboard-list"></ol>
+        <button id="clear-leaderboard" class="btn text-btn">Clear leaderboard</button>
+      </div>
     </div>
 
     <script src="index.js" charset="utf-8"></script>
 
-      </body>
-
-      <footer>
-        www 🎲 App Brewery 🎲 com
-      </footer>
-    </html>
+    <footer>
+      www 🎲 App Brewery 🎲 com
+    </footer>
+  </body>
+</html>
