@@ -8,14 +8,17 @@
 //   1. Create a free Firebase project: https://console.firebase.google.com/
 //   2. Enable "Realtime Database" and "Authentication → Anonymous" sign-in.
 //   3. Copy js/firebase-config.example.js to js/firebase-config.js and fill
-//      in your own project's values.
+//      in your own project's values. These web config values are safe to
+//      commit (see the note at the top of firebase-config.js) — real access
+//      control comes from the rules in step 4, not from hiding this file.
 //   4. Paste the security rules from database.rules.json into your Realtime
 //      Database's Rules tab (see README "Optional: Online Multiplayer").
 //   5. Reload the page and click "Play Online" — Create/Join Room will now
 //      work. Without a config file, that button shows a friendly setup
 //      reminder instead of erroring.
 //
-// js/firebase-config.js is gitignored so your API keys are never committed.
+// js/firebase-config.js is committed since Firebase web config values aren't
+// secret credentials — real access control comes from database.rules.json.
 //
 // Room model: each room is a node at /rooms/{roomCode} containing the two
 // players' names + auth uids, whose turn it is, running score, and the

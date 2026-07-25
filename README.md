@@ -44,7 +44,7 @@ Dice-Game/
 │   ├── avatar.js                     # Pure, unit-tested avatar color/initial helper
 │   ├── multiplayer.js                # Firebase room/round logic + anonymous auth (inactive until configured)
 │   ├── multiplayer-ui.js             # Wires the "Play Online" panel in index.html to multiplayer.js
-│   └── firebase-config.example.js    # Template for your own Firebase credentials (copy → firebase-config.js)
+│   └── firebase-config.example.js    # Template for your own Firebase credentials (copy → firebase-config.js, safe to commit)
 ├── tests/
 │   ├── game-logic.test.js            # Vitest unit tests for js/game-logic.js
 │   ├── stats.test.js                 # Vitest unit tests for js/stats.js
@@ -110,7 +110,7 @@ Turn-based play across two devices is fully wired up in the UI (click **🌐 Pla
 
 1. Create a project at [console.firebase.google.com](https://console.firebase.google.com/) and enable **Realtime Database**.
 2. Enable **Authentication → Sign-in method → Anonymous**. Each client signs in anonymously to get a stable ID, which the security rules use to confirm who's allowed to write to a given room.
-3. Copy `js/firebase-config.example.js` to `js/firebase-config.js` and fill in your project's config values. This file is gitignored, so your credentials are never committed.
+3. Copy `js/firebase-config.example.js` to `js/firebase-config.js` and fill in your project's config values. (These web config values aren't secret credentials — Firebase apps are designed to ship them client-side — so it's fine to commit this file. Actual access control comes from the rules in step 4.)
 4. In the Realtime Database → **Rules** tab, replace the default rules with the contents of `database.rules.json` from this repo, then click **Publish**.
 5. Reload the page. Click **Play Online**, enter a name, and either **Create Room** (share the generated code, or use **🔗 Copy invite link** to copy a one-click join URL) or **Join Room** with a code someone shared with you.
 

@@ -18,8 +18,11 @@ yarn-error.log*
 .env
 .env.local
 
-# Real Firebase credentials (see js/firebase-config.example.js for the template)
-js/firebase-config.js
+# Real Firebase credentials — see note in js/firebase-config.js.
+# (Firebase web config values aren't secret; they're safe to commit as long
+# as your database rules stay locked down. Left here as a comment in case
+# you ever want to gitignore it again for a different project.)
+# js/firebase-config.js
 
 # Test / build artifacts
 coverage/
