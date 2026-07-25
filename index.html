@@ -104,6 +104,16 @@
         <button id="clear-leaderboard" class="btn text-btn">Clear leaderboard</button>
       </div>
 
+      <div class="stats-panel">
+        <button id="toggle-stats-btn" class="btn secondary">📊 Stats</button>
+        <div id="stats-content" hidden>
+          <p id="stats-total"></p>
+          <ul id="stats-win-rates"></ul>
+          <p id="stats-avg-roll"></p>
+          <p id="stats-longest-streak"></p>
+        </div>
+      </div>
+
       <div class="online-panel">
         <button id="play-online-btn" class="btn secondary">🌐 Play Online (beta)</button>
 
@@ -122,6 +132,8 @@
 
           <div id="online-room-info" hidden>
             <p>Room code: <strong id="room-code-display"></strong> — share this with your opponent</p>
+            <button id="copy-invite-btn" class="btn text-btn">🔗 Copy invite link</button>
+            <div class="online-players-row" id="online-players-row"></div>
             <p id="online-turn-indicator"></p>
             <div class="dice-row" id="online-dice-row"></div>
             <button id="online-roll-btn" class="btn">Roll</button>

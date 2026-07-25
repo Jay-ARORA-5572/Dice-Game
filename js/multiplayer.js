@@ -6,19 +6,23 @@
 // activate real online play between two devices:
 //
 //   1. Create a free Firebase project: https://console.firebase.google.com/
-//   2. Enable "Realtime Database" (start in test mode for development).
+//   2. Enable "Realtime Database" and "Authentication → Anonymous" sign-in.
 //   3. Copy js/firebase-config.example.js to js/firebase-config.js and fill
 //      in your own project's values.
-//   4. Reload the page and click "Play Online" — Create/Join Room will now
+//   4. Paste the security rules from database.rules.json into your Realtime
+//      Database's Rules tab (see README "Optional: Online Multiplayer").
+//   5. Reload the page and click "Play Online" — Create/Join Room will now
 //      work. Without a config file, that button shows a friendly setup
 //      reminder instead of erroring.
 //
 // js/firebase-config.js is gitignored so your API keys are never committed.
 //
 // Room model: each room is a node at /rooms/{roomCode} containing the two
-// players' names, whose turn it is, running score, and the current round's
-// rolls. Both clients subscribe to the same room and stay in sync in real
-// time.
+// players' names + auth uids, whose turn it is, running score, and the
+// current round's rolls. Both clients subscribe to the same room and stay
+// in sync in real time. Anonymous auth gives each client a stable uid so
+// the security rules can restrict writes to only the two players seated
+// in that room — see database.rules.json.
 // ---------------------------------------------------------------------------
 
 import { getRoundWinnerKey } from "./game-logic.js";
@@ -33,11 +37,18 @@ export async function initMultiplayer(firebaseConfig) {
   const { getDatabase, ref, onValue, set, update, push } = await import(
     "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js"
   );
+  const { getAuth, signInAnonymously } = await import(
+    "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js"
+  );
 
   firebaseApp = initializeApp(firebaseConfig);
   db = getDatabase(firebaseApp);
 
-  return { ref, onValue, set, update, push, db };
+  const auth = getAuth(firebaseApp);
+  const { user } = await signInAnonymously(auth);
+  const uid = user.uid;
+
+  return { ref, onValue, set, update, push, db, uid };
 }
 
 export function generateRoomCode() {
@@ -47,10 +58,11 @@ export function generateRoomCode() {
 /**
  * Creates a new room with an initial state. Call after initMultiplayer().
  */
-export async function createRoom({ ref, set, db }, roomCode, hostName, matchTarget = 3) {
+export async function createRoom({ ref, set, db, uid }, roomCode, hostName, matchTarget = 3) {
   const roomRef = ref(db, `rooms/${roomCode}`);
   await set(roomRef, {
     players: { player1: hostName, player2: null },
+    uids: { player1: uid, player2: null },
     turn: "player1",
     rolls: { player1: null, player2: null },
     score: { player1: 0, player2: 0 },
@@ -64,9 +76,9 @@ export async function createRoom({ ref, set, db }, roomCode, hostName, matchTarg
 /**
  * Joins an existing room as player2.
  */
-export async function joinRoom({ ref, update, db }, roomCode, guestName) {
-  const roomRef = ref(db, `rooms/${roomCode}/players`);
-  await update(roomRef, { player2: guestName });
+export async function joinRoom({ ref, update, db, uid }, roomCode, guestName) {
+  await update(ref(db, `rooms/${roomCode}/players`), { player2: guestName });
+  await update(ref(db, `rooms/${roomCode}/uids`), { player2: uid });
 }
 
 /**

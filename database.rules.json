@@ -1,0 +1,50 @@
+{
+  "rules": {
+    "rooms": {
+      "$roomCode": {
+        ".read": true,
+
+        "players": {
+          ".write": "auth != null && (!data.parent().child('uids/player1').exists() || auth.uid == data.parent().child('uids/player1').val() || auth.uid == data.parent().child('uids/player2').val())"
+        },
+
+        "uids": {
+          "player1": {
+            ".write": "auth != null && !data.exists()"
+          },
+          "player2": {
+            ".write": "auth != null && !data.exists()"
+          }
+        },
+
+        "turn": {
+          ".write": "auth != null && (auth.uid == root.child('rooms/' + $roomCode + '/uids/player1').val() || auth.uid == root.child('rooms/' + $roomCode + '/uids/player2').val())"
+        },
+
+        "rolls": {
+          ".write": "auth != null && (auth.uid == root.child('rooms/' + $roomCode + '/uids/player1').val() || auth.uid == root.child('rooms/' + $roomCode + '/uids/player2').val())"
+        },
+
+        "score": {
+          ".write": "auth != null && auth.uid == root.child('rooms/' + $roomCode + '/uids/player1').val()"
+        },
+
+        "lastRound": {
+          ".write": "auth != null && auth.uid == root.child('rooms/' + $roomCode + '/uids/player1').val()"
+        },
+
+        "matchWinner": {
+          ".write": "auth != null && auth.uid == root.child('rooms/' + $roomCode + '/uids/player1').val()"
+        },
+
+        "matchTarget": {
+          ".write": "auth != null && !data.exists()"
+        },
+
+        "createdAt": {
+          ".write": "auth != null && !data.exists()"
+        }
+      }
+    }
+  }
+}

@@ -24,8 +24,11 @@ A two-player dice-rolling game built with vanilla HTML, CSS, and JavaScript — 
 - 🌗 **Dark / light theme toggle** — preference is remembered on your next visit
 - 📱 **Responsive layout** — dice stack vertically and text scales down on mobile
 - 📲 **Installable PWA** — add it to your phone or desktop home screen and play offline (via `manifest.json` + a service worker)
-- 🌐 **Optional online multiplayer** — turn-based play across two devices via Firebase (see setup below)
-- ✅ **Unit tested** — core game logic is covered by Vitest, run automatically in CI on every push
+- 🌐 **Online multiplayer** — turn-based play across two devices via Firebase, with a one-click "Copy invite link" (see setup below)
+- 🔒 **Real database security rules** — writes are restricted to the two authenticated players seated in a room (see `database.rules.json`)
+- 🧑‍🤝‍🧑 **Player avatars** — a deterministic colored initial badge per name, shown locally and in online rooms
+- 📈 **Stats panel** — win rate per name, average roll, and longest-ever win streak, computed from your stored match history
+- ✅ **Unit tested** — core game, stats, and avatar logic are covered by Vitest, run automatically in CI on every push
 
 ## Project Structure
 
@@ -33,14 +36,19 @@ A two-player dice-rolling game built with vanilla HTML, CSS, and JavaScript — 
 Dice-Game/
 ├── index.html                       # Main HTML page
 ├── styles.css                        # Styling, theme variables, animations, responsive layout
-├── index.js                          # App logic: DOM, sound, confetti, leaderboard, theme (ES module)
+├── index.js                          # App logic: DOM, sound, confetti, leaderboard, stats, theme (ES module)
+├── database.rules.json               # Firebase Realtime Database security rules (paste into your project)
 ├── js/
 │   ├── game-logic.js                 # Pure, unit-tested game logic (rolling, scoring, winner detection)
-│   ├── multiplayer.js                # Firebase room/round logic (inactive until you add your own config)
+│   ├── stats.js                      # Pure, unit-tested stats aggregation from leaderboard history
+│   ├── avatar.js                     # Pure, unit-tested avatar color/initial helper
+│   ├── multiplayer.js                # Firebase room/round logic + anonymous auth (inactive until configured)
 │   ├── multiplayer-ui.js             # Wires the "Play Online" panel in index.html to multiplayer.js
 │   └── firebase-config.example.js    # Template for your own Firebase credentials (copy → firebase-config.js)
 ├── tests/
-│   └── game-logic.test.js            # Vitest unit tests for js/game-logic.js
+│   ├── game-logic.test.js            # Vitest unit tests for js/game-logic.js
+│   ├── stats.test.js                 # Vitest unit tests for js/stats.js
+│   └── avatar.test.js                # Vitest unit tests for js/avatar.js
 ├── .github/workflows/tests.yml       # CI: runs the test suite on every push/PR
 ├── favicon.svg                       # Site favicon
 ├── manifest.json                     # Web App Manifest (PWA installability)
@@ -74,7 +82,7 @@ Dice-Game/
 
 ## Running Tests
 
-Core game logic (`js/game-logic.js`) is covered by [Vitest](https://vitest.dev):
+Core game, stats, and avatar logic (`js/game-logic.js`, `js/stats.js`, `js/avatar.js`) are covered by [Vitest](https://vitest.dev):
 
 ```bash
 npm install
@@ -101,12 +109,16 @@ Once installed, it works offline and launches in its own window like a native ap
 Turn-based play across two devices is fully wired up in the UI (click **🌐 Play Online (beta)**) using Firebase Realtime Database — but it's **inactive until you add your own free Firebase project**, since credentials can't be shipped in the repo:
 
 1. Create a project at [console.firebase.google.com](https://console.firebase.google.com/) and enable **Realtime Database**.
-2. Copy `js/firebase-config.example.js` to `js/firebase-config.js` and fill in your project's config values. This file is gitignored, so your credentials are never committed.
-3. Reload the page. Click **Play Online**, enter a name, and either **Create Room** (share the generated code with your opponent) or **Join Room** with a code someone shared with you.
+2. Enable **Authentication → Sign-in method → Anonymous**. Each client signs in anonymously to get a stable ID, which the security rules use to confirm who's allowed to write to a given room.
+3. Copy `js/firebase-config.example.js` to `js/firebase-config.js` and fill in your project's config values. This file is gitignored, so your credentials are never committed.
+4. In the Realtime Database → **Rules** tab, replace the default rules with the contents of `database.rules.json` from this repo, then click **Publish**.
+5. Reload the page. Click **Play Online**, enter a name, and either **Create Room** (share the generated code, or use **🔗 Copy invite link** to copy a one-click join URL) or **Join Room** with a code someone shared with you.
 
-Until step 2 is done, clicking Create/Join Room shows a friendly reminder instead of erroring out.
+Until step 3 is done, clicking Create/Join Room shows a friendly reminder instead of erroring out.
 
-**Note for the Realtime Database security rules:** the "test mode" default Firebase offers is open read/write to anyone for 30 days — fine for trying this out, but tighten the rules before sharing the link widely.
+**About the security rules:** `database.rules.json` restricts writes so that only the two anonymous-auth UIDs seated in a given room can write to it — a real improvement over Firebase's wide-open 30-day "test mode" default. It's not bulletproof (there's no real account system, so it can't stop someone from joining a room before the intended second player if they guess/see the code in time), but it's a solid baseline for a project at this scale. If you want stronger guarantees later, the natural next step is real user accounts (Firebase Auth with email or a provider like Google) instead of anonymous sign-in.
+
+**Invite links:** the copied link includes `?room=CODE` — opening it auto-expands the online panel and pre-fills the room code, so joining a friend's game is a single click plus entering a name.
 
 ## Tech Stack
 

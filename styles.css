@@ -249,6 +249,50 @@ img {
   padding: 4px;
 }
 
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: #fff;
+  font-family: 'Poppins', Arial, sans-serif;
+  font-weight: bold;
+  font-size: 0.85rem;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.online-players-row {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin: 10px 0;
+  font-family: 'Indie Flower', cursive;
+  font-size: 1.2rem;
+}
+
+.stats-panel {
+  margin: 20px auto 10px;
+  max-width: 420px;
+}
+
+#stats-content {
+  margin-top: 14px;
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 16px;
+  color: var(--text-color);
+  font-family: 'Indie Flower', cursive;
+  text-align: left;
+}
+
+#stats-win-rates {
+  padding-left: 20px;
+  margin: 8px 0;
+}
+
 .online-panel {
   margin: 24px auto 10px;
   max-width: 500px;

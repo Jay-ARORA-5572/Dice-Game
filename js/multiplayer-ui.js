@@ -7,6 +7,7 @@ import {
   submitRoll,
   resolveRound,
 } from "./multiplayer.js";
+import { renderPlayerLabel } from "./avatar.js";
 
 // ----- Elements -----
 const playOnlineBtn = document.getElementById("play-online-btn");
@@ -19,6 +20,8 @@ const joinRoomBtn = document.getElementById("join-room-btn");
 const statusEl = document.getElementById("online-status");
 const roomInfo = document.getElementById("online-room-info");
 const roomCodeDisplay = document.getElementById("room-code-display");
+const copyInviteBtn = document.getElementById("copy-invite-btn");
+const onlinePlayersRow = document.getElementById("online-players-row");
 const turnIndicator = document.getElementById("online-turn-indicator");
 const diceRow = document.getElementById("online-dice-row");
 const onlineRollBtn = document.getElementById("online-roll-btn");
@@ -83,6 +86,18 @@ async function handleJoinRoom() {
   subscribeToRoom(h, roomCode, renderRoomState);
 }
 
+async function handleCopyInvite() {
+  if (!currentRoomCode) return;
+  const url = new URL(window.location.href);
+  url.searchParams.set("room", currentRoomCode);
+  try {
+    await navigator.clipboard.writeText(url.toString());
+    setStatus("Invite link copied! Send it to your opponent.");
+  } catch (e) {
+    setStatus(`Copy this link: ${url.toString()}`);
+  }
+}
+
 async function handleOnlineRoll() {
   if (!handles || !currentRoomCode || !localPlayerKey) return;
   const rollValue = Math.floor(Math.random() * 6) + 1;
@@ -100,6 +115,14 @@ async function renderRoomState(state) {
 
   const p1Name = state.players.player1 || "Player 1";
   const p2Name = state.players.player2 || "Waiting for player 2…";
+
+  onlinePlayersRow.innerHTML = "";
+  const p1Span = document.createElement("span");
+  renderPlayerLabel(p1Span, p1Name);
+  const p2Span = document.createElement("span");
+  renderPlayerLabel(p2Span, p2Name);
+  onlinePlayersRow.appendChild(p1Span);
+  onlinePlayersRow.appendChild(p2Span);
 
   scoreDisplay.textContent = `${p1Name}: ${state.score.player1}  |  ${p2Name}: ${state.score.player2}`;
 
@@ -156,3 +179,14 @@ playOnlineBtn.addEventListener("click", () => {
 createRoomBtn.addEventListener("click", handleCreateRoom);
 joinRoomBtn.addEventListener("click", handleJoinRoom);
 onlineRollBtn.addEventListener("click", handleOnlineRoll);
+copyInviteBtn.addEventListener("click", handleCopyInvite);
+
+// If the page was opened via an invite link (?room=ABCDE), open the panel
+// and pre-fill the room code so joining is a single click.
+const roomFromUrl = new URLSearchParams(window.location.search).get("room");
+if (roomFromUrl) {
+  onlineControls.removeAttribute("hidden");
+  playOnlineBtn.textContent = "🌐 Hide Online Play";
+  joinCodeInput.value = roomFromUrl.toUpperCase();
+  setStatus(`Invite link detected for room ${roomFromUrl.toUpperCase()}. Enter your name and click Join Room.`);
+}

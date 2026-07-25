@@ -5,6 +5,8 @@ import {
   applyVariant,
   updateStreak,
 } from "./js/game-logic.js";
+import { renderPlayerLabel } from "./js/avatar.js";
+import { computeStats, winRatesByName } from "./js/stats.js";
 
 // ----- Element references -----
 const rollBtn = document.getElementById("roll-btn");
@@ -27,6 +29,12 @@ const player2Label = document.getElementById("player2-label");
 const streak1El = document.getElementById("streak-1");
 const streak2El = document.getElementById("streak-2");
 const confettiCanvas = document.getElementById("confetti-canvas");
+const toggleStatsBtn = document.getElementById("toggle-stats-btn");
+const statsContent = document.getElementById("stats-content");
+const statsTotalEl = document.getElementById("stats-total");
+const statsWinRatesEl = document.getElementById("stats-win-rates");
+const statsAvgRollEl = document.getElementById("stats-avg-roll");
+const statsLongestStreakEl = document.getElementById("stats-longest-streak");
 
 // ----- Game state -----
 let matchScore = { player1: 0, player2: 0 };
@@ -67,8 +75,8 @@ function loadNames() {
 
 function updateNameLabels() {
   const { p1, p2 } = getPlayerNames();
-  player1Label.textContent = p1;
-  player2Label.textContent = p2;
+  renderPlayerLabel(player1Label, p1);
+  renderPlayerLabel(player2Label, p2);
   player2NameInput.disabled = vsComputerCheckbox.checked;
 }
 
@@ -285,6 +293,7 @@ function saveToLeaderboard(winner, score1, score2, rounds) {
   const trimmed = board.slice(0, 10);
   localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(trimmed));
   renderLeaderboard();
+  if (!statsContent.hasAttribute("hidden")) renderStats();
 }
 
 function renderLeaderboard() {
@@ -334,6 +343,44 @@ function renderLeaderboard() {
 function clearLeaderboard() {
   localStorage.removeItem(LEADERBOARD_KEY);
   renderLeaderboard();
+  renderStats();
+}
+
+// ----- Stats -----
+function renderStats() {
+  const stats = computeStats(getLeaderboard());
+
+  if (stats.totalMatches === 0) {
+    statsTotalEl.textContent = "No matches played yet.";
+    statsWinRatesEl.innerHTML = "";
+    statsAvgRollEl.textContent = "";
+    statsLongestStreakEl.textContent = "";
+    return;
+  }
+
+  statsTotalEl.textContent = `Matches played: ${stats.totalMatches}`;
+
+  statsWinRatesEl.innerHTML = "";
+  winRatesByName(stats).forEach(({ name, wins, winRate }) => {
+    const li = document.createElement("li");
+    li.textContent = `${name}: ${wins} win${wins === 1 ? "" : "s"} (${Math.round(winRate * 100)}%)`;
+    statsWinRatesEl.appendChild(li);
+  });
+
+  statsAvgRollEl.textContent = stats.avgRoll !== null
+    ? `Average roll total: ${stats.avgRoll.toFixed(2)}`
+    : "";
+  statsLongestStreakEl.textContent = `Longest win streak ever: ${stats.longestStreak} round${stats.longestStreak === 1 ? "" : "s"}`;
+}
+
+function toggleStats() {
+  const isHidden = statsContent.hasAttribute("hidden");
+  if (isHidden) {
+    renderStats();
+    statsContent.removeAttribute("hidden");
+  } else {
+    statsContent.setAttribute("hidden", "");
+  }
 }
 
 // ----- Theme toggle -----
@@ -368,6 +415,7 @@ function init() {
   resetBtn.addEventListener("click", resetMatch);
   themeToggleBtn.addEventListener("click", toggleTheme);
   clearLeaderboardBtn.addEventListener("click", clearLeaderboard);
+  toggleStatsBtn.addEventListener("click", toggleStats);
   diceCountSelect.addEventListener("change", resetMatch);
   bestOfSelect.addEventListener("change", resetMatch);
   variantSelect.addEventListener("change", resetMatch);
