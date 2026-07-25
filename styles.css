@@ -38,6 +38,7 @@ body {
   margin: auto;
   text-align: center;
   padding-top: 20px;
+  padding-bottom: 40px;
 }
 
 .theme-toggle {
@@ -248,6 +249,42 @@ img {
   padding: 4px;
 }
 
+.online-panel {
+  margin: 24px auto 10px;
+  max-width: 500px;
+}
+
+#online-controls {
+  margin-top: 16px;
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 18px;
+  color: var(--text-color);
+  font-family: 'Indie Flower', cursive;
+}
+
+.online-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.code-input {
+  width: 100px;
+  text-transform: uppercase;
+}
+
+#online-status {
+  min-height: 1.4rem;
+}
+
+#online-room-info p {
+  margin: 8px 0;
+}
+
 .leaderboard {
   margin: 30px auto 10px;
   max-width: 420px;
@@ -273,14 +310,6 @@ img {
 
 .leaderboard li {
   margin-bottom: 6px;
-}
-
-footer {
-  margin-top: 5%;
-  padding-bottom: 20px;
-  color: var(--text-color);
-  text-align: center;
-  font-family: 'Indie Flower', cursive;
 }
 
 /* Mobile responsiveness */

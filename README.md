@@ -36,7 +36,8 @@ Dice-Game/
 ├── index.js                          # App logic: DOM, sound, confetti, leaderboard, theme (ES module)
 ├── js/
 │   ├── game-logic.js                 # Pure, unit-tested game logic (rolling, scoring, winner detection)
-│   ├── multiplayer.js                # Optional Firebase online-multiplayer module (disabled by default)
+│   ├── multiplayer.js                # Firebase room/round logic (inactive until you add your own config)
+│   ├── multiplayer-ui.js             # Wires the "Play Online" panel in index.html to multiplayer.js
 │   └── firebase-config.example.js    # Template for your own Firebase credentials (copy → firebase-config.js)
 ├── tests/
 │   └── game-logic.test.js            # Vitest unit tests for js/game-logic.js
@@ -84,23 +85,28 @@ Tests run automatically on every push via GitHub Actions (see the badge above).
 
 ## Installing as an App
 
-Dicee is a Progressive Web App — no app store required:
+Dicee is a Progressive Web App — no app store required.
 
-- **On mobile (Chrome/Safari):** open the hosted site, then use "Add to Home Screen" from the browser menu.
-- **On desktop (Chrome/Edge):** click the install icon in the address bar, or the browser menu's "Install Dicee" option.
+**▶ [Open & install Dicee](https://jay-arora-5572.github.io/Dice-Game/)** *(requires GitHub Pages to be enabled on this repo — see note below)*
+
+- **On mobile (Chrome/Safari):** open the link above, then use "Add to Home Screen" from the browser menu.
+- **On desktop (Chrome/Edge):** open the link above, then click the install icon in the address bar, or the browser menu's "Install Dicee" option.
 
 Once installed, it works offline and launches in its own window like a native app.
 
+> **Note:** the link above only works once GitHub Pages is turned on for this repo: go to **Settings → Pages → Source**, select the `main` branch, and save. It'll be live at that URL within a minute or two.
+
 ## Optional: Online Multiplayer
 
-Turn-based play across two devices is scaffolded in `js/multiplayer.js` using Firebase Realtime Database, but **disabled by default** — it needs your own free Firebase project:
+Turn-based play across two devices is fully wired up in the UI (click **🌐 Play Online (beta)**) using Firebase Realtime Database — but it's **inactive until you add your own free Firebase project**, since credentials can't be shipped in the repo:
 
 1. Create a project at [console.firebase.google.com](https://console.firebase.google.com/) and enable **Realtime Database**.
 2. Copy `js/firebase-config.example.js` to `js/firebase-config.js` and fill in your project's config values. This file is gitignored, so your credentials are never committed.
-3. In `index.html`, uncomment the `<script type="module" src="js/multiplayer.js">` line near the bottom.
-4. Wire up room creation / joining using the exported functions (`createRoom`, `joinRoom`, `subscribeToRoom`, `submitRoll`) — see the comments in `js/multiplayer.js` for the room data model.
+3. Reload the page. Click **Play Online**, enter a name, and either **Create Room** (share the generated code with your opponent) or **Join Room** with a code someone shared with you.
 
-This is intentionally left as a scaffold rather than a fully wired feature, since it depends on credentials only you can provision.
+Until step 2 is done, clicking Create/Join Room shows a friendly reminder instead of erroring out.
+
+**Note for the Realtime Database security rules:** the "test mode" default Firebase offers is open read/write to anyone for 30 days — fine for trying this out, but tighten the rules before sharing the link widely.
 
 ## Tech Stack
 

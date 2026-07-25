@@ -103,20 +103,36 @@
         <ol id="leaderboard-list"></ol>
         <button id="clear-leaderboard" class="btn text-btn">Clear leaderboard</button>
       </div>
+
+      <div class="online-panel">
+        <button id="play-online-btn" class="btn secondary">🌐 Play Online (beta)</button>
+
+        <div id="online-controls" hidden>
+          <div id="online-setup">
+            <input id="online-name-input" class="name-input" type="text" maxlength="16" placeholder="Your name">
+            <div class="online-actions">
+              <button id="create-room-btn" class="btn">Create Room</button>
+              <span class="hint">or</span>
+              <input id="join-code-input" class="name-input code-input" type="text" maxlength="5" placeholder="Room code">
+              <button id="join-room-btn" class="btn">Join Room</button>
+            </div>
+          </div>
+
+          <p id="online-status" class="hint"></p>
+
+          <div id="online-room-info" hidden>
+            <p>Room code: <strong id="room-code-display"></strong> — share this with your opponent</p>
+            <p id="online-turn-indicator"></p>
+            <div class="dice-row" id="online-dice-row"></div>
+            <button id="online-roll-btn" class="btn">Roll</button>
+            <p id="online-score-display"></p>
+            <p id="online-winner-display"></p>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script type="module" src="index.js"></script>
-
-    <!--
-      Optional online multiplayer (Firebase). Disabled by default — see
-      "Optional: Online Multiplayer" in README.md for setup steps.
-      Once js/firebase-config.js exists with your own project credentials,
-      uncomment the line below.
-    -->
-    <!-- <script type="module" src="js/multiplayer.js"></script> -->
-
-    <footer>
-      www 🎲 App Brewery 🎲 com
-    </footer>
+    <script type="module" src="js/multiplayer-ui.js"></script>
   </body>
 </html>
