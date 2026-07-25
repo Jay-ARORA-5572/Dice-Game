@@ -63,6 +63,77 @@ h1 {
   color: var(--accent-color);
 }
 
+.confetti-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  display: none;
+  z-index: 20;
+}
+
+.player-names {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.name-input {
+  font-family: 'Indie Flower', cursive;
+  font-size: 1.2rem;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--accent-color);
+  background: var(--card-bg);
+  color: var(--text-color);
+  text-align: center;
+  width: 160px;
+}
+
+.name-input:disabled {
+  opacity: 0.5;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hint {
+  font-size: 0.9rem;
+  opacity: 0.75;
+  font-weight: normal;
+}
+
+.streak {
+  display: block;
+  min-height: 1.4rem;
+  color: #F5D547;
+  font-family: 'Indie Flower', cursive;
+  font-size: 1.1rem;
+  margin-top: 6px;
+}
+
+.leaderboard-entry {
+  margin-bottom: 10px;
+}
+
+.leaderboard-summary {
+  text-decoration: underline dotted;
+}
+
+.leaderboard-detail {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
 .settings {
   display: flex;
   justify-content: center;

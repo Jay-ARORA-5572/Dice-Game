@@ -5,6 +5,7 @@ const ASSETS_TO_CACHE = [
   "./index.html",
   "./styles.css",
   "./index.js",
+  "./js/game-logic.js",
   "./manifest.json",
   "./favicon.svg",
   "./icons/icon-192.png",

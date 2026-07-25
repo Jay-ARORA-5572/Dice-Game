@@ -17,3 +17,9 @@ yarn-error.log*
 # Environment variables
 .env
 .env.local
+
+# Real Firebase credentials (see js/firebase-config.example.js for the template)
+js/firebase-config.js
+
+# Test / build artifacts
+coverage/

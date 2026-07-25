@@ -1,0 +1,18 @@
+{
+  "name": "dicee",
+  "version": "2.0.0",
+  "description": "A two-player dice-rolling game with best-of-N tournaments, sound effects, and a local leaderboard.",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jay-ARORA-5572/Dice-Game.git"
+  },
+  "license": "MIT"
+}
