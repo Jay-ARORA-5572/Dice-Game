@@ -43,13 +43,20 @@ async function ensureFirebaseReady() {
   try {
     ({ firebaseConfig } = await import("./firebase-config.js"));
   } catch (e) {
+    console.error("Failed to load js/firebase-config.js:", e);
     setStatus(
-      "Online play needs a Firebase project. See \"Optional: Online Multiplayer\" in README.md to set one up (takes ~5 minutes)."
+      "Online play needs a Firebase project. See \"Optional: Online Multiplayer\" in README.md to set one up (takes ~5 minutes). (Check the browser console for the exact error.)"
     );
     return null;
   }
-  handles = await initMultiplayer(firebaseConfig);
-  return handles;
+  try {
+    handles = await initMultiplayer(firebaseConfig);
+    return handles;
+  } catch (e) {
+    console.error("Failed to initialize Firebase:", e);
+    setStatus(`Couldn't connect to Firebase: ${e.message || e}`);
+    return null;
+  }
 }
 
 async function handleCreateRoom() {
