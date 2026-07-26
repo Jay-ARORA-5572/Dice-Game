@@ -142,8 +142,9 @@ async function renderRoomState(state) {
   winnerDisplay.textContent = "";
 
   diceRow.innerHTML = "";
+  const rolls = state.rolls || {};
   ["player1", "player2"].forEach((key) => {
-    const value = state.rolls[key];
+    const value = rolls[key];
     if (value) {
       const img = document.createElement("img");
       img.src = `images/dice${value}.png`;
@@ -153,7 +154,7 @@ async function renderRoomState(state) {
   });
 
   const isMyTurn = state.turn === localPlayerKey;
-  const bothRolled = state.rolls.player1 && state.rolls.player2;
+  const bothRolled = rolls.player1 && rolls.player2;
 
   if (bothRolled) {
     turnIndicator.textContent = "Resolving round…";
