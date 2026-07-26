@@ -28,7 +28,7 @@
 // in that room — see database.rules.json.
 // ---------------------------------------------------------------------------
 
-import { getRoundWinnerKey } from "./game-logic.js";
+import { getRoundWinnerKey, sum } from "./game-logic.js";
 
 let firebaseApp = null;
 let db = null;
@@ -61,7 +61,7 @@ export function generateRoomCode() {
 /**
  * Creates a new room with an initial state. Call after initMultiplayer().
  */
-export async function createRoom({ ref, set, db, uid }, roomCode, hostName, matchTarget = 3) {
+export async function createRoom({ ref, set, db, uid }, roomCode, hostName, matchTarget = 3, diceCount = 1) {
   const roomRef = ref(db, `rooms/${roomCode}`);
   await set(roomRef, {
     players: { player1: hostName, player2: null },
@@ -70,6 +70,7 @@ export async function createRoom({ ref, set, db, uid }, roomCode, hostName, matc
     rolls: { player1: null, player2: null },
     score: { player1: 0, player2: 0 },
     matchTarget,
+    diceCount,
     matchWinner: null,
     lastRound: null,
     createdAt: Date.now(),
@@ -96,12 +97,13 @@ export function subscribeToRoom({ ref, onValue, db }, roomCode, callback) {
 }
 
 /**
- * Submits the current player's roll and hands the turn to the other player.
+ * Submits the current player's roll (an array of dice values) and hands
+ * the turn to the other player.
  */
-export async function submitRoll({ ref, update, db }, roomCode, playerKey, rollValue) {
+export async function submitRoll({ ref, update, db }, roomCode, playerKey, rollValues) {
   const nextTurn = playerKey === "player1" ? "player2" : "player1";
   await update(ref(db, `rooms/${roomCode}`), {
-    [`rolls/${playerKey}`]: rollValue,
+    [`rolls/${playerKey}`]: rollValues,
     turn: nextTurn,
   });
 }
@@ -109,12 +111,15 @@ export async function submitRoll({ ref, update, db }, roomCode, playerKey, rollV
 /**
  * Once both players have rolled, resolves the round: updates score, clears
  * rolls for the next round, and sets matchWinner if the target is reached.
- * Only the room host's client should call this (see js/multiplayer-ui.js)
- * to avoid both clients writing the resolution at once.
+ * Both clients may call this (the security rules allow either seated
+ * player to write); a small guard in js/multiplayer-ui.js prevents both
+ * from doing it for the same round.
  */
 export async function resolveRound({ ref, update, db }, roomCode, state) {
   const { rolls, score, matchTarget } = state;
-  const winnerKey = getRoundWinnerKey(rolls.player1, rolls.player2);
+  const total1 = sum(rolls.player1);
+  const total2 = sum(rolls.player2);
+  const winnerKey = getRoundWinnerKey(total1, total2);
 
   const newScore = { ...score };
   if (winnerKey) newScore[winnerKey] += 1;
@@ -130,5 +135,19 @@ export async function resolveRound({ ref, update, db }, roomCode, state) {
     rolls: { player1: null, player2: null },
     turn: "player1",
     matchWinner,
+  });
+}
+
+/**
+ * Starts a new match in the same room: resets score/rolls/turn/matchWinner
+ * but keeps the same players, dice count, and match target.
+ */
+export async function playAgainRoom({ ref, update, db }, roomCode) {
+  await update(ref(db, `rooms/${roomCode}`), {
+    score: { player1: 0, player2: 0 },
+    rolls: { player1: null, player2: null },
+    turn: "player1",
+    matchWinner: null,
+    lastRound: null,
   });
 }

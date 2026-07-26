@@ -6,6 +6,7 @@ import {
   subscribeToRoom,
   submitRoll,
   resolveRound,
+  playAgainRoom,
 } from "./multiplayer.js";
 import { renderPlayerLabel } from "./avatar.js";
 
@@ -14,6 +15,8 @@ const playOnlineBtn = document.getElementById("play-online-btn");
 const onlineControls = document.getElementById("online-controls");
 const onlineSetup = document.getElementById("online-setup");
 const nameInput = document.getElementById("online-name-input");
+const onlineDiceCountSelect = document.getElementById("online-dice-count");
+const onlineBestOfSelect = document.getElementById("online-best-of");
 const createRoomBtn = document.getElementById("create-room-btn");
 const joinCodeInput = document.getElementById("join-code-input");
 const joinRoomBtn = document.getElementById("join-room-btn");
@@ -27,11 +30,18 @@ const diceRow = document.getElementById("online-dice-row");
 const onlineRollBtn = document.getElementById("online-roll-btn");
 const scoreDisplay = document.getElementById("online-score-display");
 const winnerDisplay = document.getElementById("online-winner-display");
+const playAgainBtn = document.getElementById("online-play-again-btn");
+const onlineLeaderboardList = document.getElementById("online-leaderboard-list");
+const clearOnlineLeaderboardBtn = document.getElementById("clear-online-leaderboard");
+
+const ONLINE_LEADERBOARD_KEY = "diceeOnlineLeaderboard";
 
 // ----- State -----
 let handles = null; // { ref, onValue, set, update, push, db } once Firebase is initialized
 let currentRoomCode = null;
 let localPlayerKey = null; // "player1" (host) or "player2" (guest)
+let currentDiceCount = 1;
+let hasSavedThisMatch = false;
 
 function setStatus(message) {
   statusEl.textContent = message;
@@ -65,10 +75,13 @@ async function handleCreateRoom() {
 
   const hostName = nameInput.value.trim() || "Player 1";
   const roomCode = generateRoomCode();
+  const matchTarget = parseInt(onlineBestOfSelect.value, 10);
+  const diceCount = parseInt(onlineDiceCountSelect.value, 10);
 
-  await createRoom(h, roomCode, hostName, 3);
+  await createRoom(h, roomCode, hostName, matchTarget, diceCount);
   currentRoomCode = roomCode;
   localPlayerKey = "player1";
+  hasSavedThisMatch = false;
 
   setStatus(`Room created! Share code ${roomCode} with your opponent.`);
   subscribeToRoom(h, roomCode, renderRoomState);
@@ -88,6 +101,7 @@ async function handleJoinRoom() {
   await joinRoom(h, roomCode, guestName);
   currentRoomCode = roomCode;
   localPlayerKey = "player2";
+  hasSavedThisMatch = false;
 
   setStatus(`Joined room ${roomCode}.`);
   subscribeToRoom(h, roomCode, renderRoomState);
@@ -107,11 +121,63 @@ async function handleCopyInvite() {
 
 async function handleOnlineRoll() {
   if (!handles || !currentRoomCode || !localPlayerKey) return;
-  const rollValue = Math.floor(Math.random() * 6) + 1;
+  const rollValues = Array.from(
+    { length: currentDiceCount },
+    () => Math.floor(Math.random() * 6) + 1
+  );
   onlineRollBtn.disabled = true;
-  await submitRoll(handles, currentRoomCode, localPlayerKey, rollValue);
+  await submitRoll(handles, currentRoomCode, localPlayerKey, rollValues);
 }
 
+async function handlePlayAgain() {
+  if (!handles || !currentRoomCode) return;
+  hasSavedThisMatch = false;
+  await playAgainRoom(handles, currentRoomCode);
+}
+
+// ----- Online leaderboard (localStorage, per device) -----
+function getOnlineLeaderboard() {
+  try {
+    const raw = localStorage.getItem(ONLINE_LEADERBOARD_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveOnlineMatch(winnerName, score1, score2) {
+  const board = getOnlineLeaderboard();
+  board.unshift({
+    winner: winnerName,
+    score: `${score1}-${score2}`,
+    date: new Date().toLocaleDateString(),
+  });
+  localStorage.setItem(ONLINE_LEADERBOARD_KEY, JSON.stringify(board.slice(0, 10)));
+  renderOnlineLeaderboard();
+}
+
+function renderOnlineLeaderboard() {
+  const board = getOnlineLeaderboard();
+  onlineLeaderboardList.innerHTML = "";
+  if (board.length === 0) {
+    const li = document.createElement("li");
+    li.textContent = "No online matches played yet.";
+    onlineLeaderboardList.appendChild(li);
+    return;
+  }
+  board.forEach((entry) => {
+    const li = document.createElement("li");
+    li.textContent = `${entry.winner} won ${entry.score} — ${entry.date}`;
+    onlineLeaderboardList.appendChild(li);
+  });
+}
+
+function clearOnlineLeaderboard() {
+  localStorage.removeItem(ONLINE_LEADERBOARD_KEY);
+  renderOnlineLeaderboard();
+}
+
+// ----- Room state rendering -----
 let resolving = false;
 async function renderRoomState(state) {
   if (!state) return;
@@ -119,6 +185,7 @@ async function renderRoomState(state) {
   onlineSetup.hidden = true;
   roomInfo.hidden = false;
   roomCodeDisplay.textContent = currentRoomCode;
+  currentDiceCount = state.diceCount || 1;
 
   const p1Name = state.players.player1 || "Player 1";
   const p2Name = state.players.player2 || "Waiting for player 2…";
@@ -137,19 +204,28 @@ async function renderRoomState(state) {
     const winnerName = state.matchWinner === "player1" ? p1Name : p2Name;
     winnerDisplay.textContent = `🏆 ${winnerName} wins the match!`;
     onlineRollBtn.disabled = true;
+    playAgainBtn.hidden = false;
+
+    if (!hasSavedThisMatch) {
+      hasSavedThisMatch = true;
+      saveOnlineMatch(winnerName, state.score.player1, state.score.player2);
+    }
     return;
   }
   winnerDisplay.textContent = "";
+  playAgainBtn.hidden = true;
 
   diceRow.innerHTML = "";
   const rolls = state.rolls || {};
   ["player1", "player2"].forEach((key) => {
-    const value = rolls[key];
-    if (value) {
-      const img = document.createElement("img");
-      img.src = `images/dice${value}.png`;
-      img.alt = "Dice Image";
-      diceRow.appendChild(img);
+    const values = rolls[key];
+    if (values) {
+      values.forEach((value) => {
+        const img = document.createElement("img");
+        img.src = `images/dice${value}.png`;
+        img.alt = "Dice Image";
+        diceRow.appendChild(img);
+      });
     }
   });
 
@@ -159,7 +235,10 @@ async function renderRoomState(state) {
   if (bothRolled) {
     turnIndicator.textContent = "Resolving round…";
     onlineRollBtn.disabled = true;
-    // Only the host resolves, so both clients don't write at once.
+    // Only the host resolves, to avoid both clients writing the same
+    // resolution at once (harmless since they'd compute identical values,
+    // but wasteful) — either seated player is technically allowed to per
+    // the security rules.
     if (localPlayerKey === "player1" && !resolving) {
       resolving = true;
       await resolveRound(handles, currentRoomCode, state);
@@ -173,6 +252,8 @@ async function renderRoomState(state) {
 }
 
 // ----- Init -----
+renderOnlineLeaderboard();
+
 playOnlineBtn.addEventListener("click", () => {
   const isHidden = onlineControls.hasAttribute("hidden");
   if (isHidden) {
@@ -188,6 +269,8 @@ createRoomBtn.addEventListener("click", handleCreateRoom);
 joinRoomBtn.addEventListener("click", handleJoinRoom);
 onlineRollBtn.addEventListener("click", handleOnlineRoll);
 copyInviteBtn.addEventListener("click", handleCopyInvite);
+playAgainBtn.addEventListener("click", handlePlayAgain);
+clearOnlineLeaderboardBtn.addEventListener("click", clearOnlineLeaderboard);
 
 // If the page was opened via an invite link (?room=ABCDE), open the panel
 // and pre-fill the room code so joining is a single click.

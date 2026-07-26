@@ -24,7 +24,7 @@ A two-player dice-rolling game built with vanilla HTML, CSS, and JavaScript — 
 - 🌗 **Dark / light theme toggle** — preference is remembered on your next visit
 - 📱 **Responsive layout** — dice stack vertically and text scales down on mobile
 - 📲 **Installable PWA** — add it to your phone or desktop home screen and play offline (via `manifest.json` + a service worker)
-- 🌐 **Online multiplayer** — turn-based play across two devices via Firebase, with a one-click "Copy invite link" (see setup below)
+- 🌐 **Online multiplayer** — turn-based play across two devices via Firebase, with configurable dice count and match length per room, a one-click "Copy invite link," a "Play Again" button to start a new match without re-creating the room, and its own leaderboard of online match results (see setup below)
 - 🔒 **Real database security rules** — writes are restricted to the two authenticated players seated in a room (see `database.rules.json`)
 - 🧑‍🤝‍🧑 **Player avatars** — a deterministic colored initial badge per name, shown locally and in online rooms
 - 📈 **Stats panel** — win rate per name, average roll, and longest-ever win streak, computed from your stored match history

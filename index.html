@@ -120,6 +120,25 @@
         <div id="online-controls" hidden>
           <div id="online-setup">
             <input id="online-name-input" class="name-input" type="text" maxlength="16" placeholder="Your name">
+            <div class="settings">
+              <label>
+                Dice per player
+                <select id="online-dice-count">
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                </select>
+              </label>
+              <label>
+                First to
+                <select id="online-best-of">
+                  <option value="1">1 win</option>
+                  <option value="3" selected>3 wins</option>
+                  <option value="5">5 wins</option>
+                </select>
+              </label>
+            </div>
+            <p class="hint">Dice count and match length are set by whoever creates the room.</p>
             <div class="online-actions">
               <button id="create-room-btn" class="btn">Create Room</button>
               <span class="hint">or</span>
@@ -139,6 +158,14 @@
             <button id="online-roll-btn" class="btn">Roll</button>
             <p id="online-score-display"></p>
             <p id="online-winner-display"></p>
+            <button id="online-play-again-btn" class="btn" hidden>🔁 Play Again</button>
+          </div>
+
+          <div class="leaderboard" id="online-leaderboard-panel">
+            <h2>Online Leaderboard</h2>
+            <p class="hint">Matches you've played online, on this device</p>
+            <ol id="online-leaderboard-list"></ol>
+            <button id="clear-online-leaderboard" class="btn text-btn">Clear online leaderboard</button>
           </div>
         </div>
       </div>
