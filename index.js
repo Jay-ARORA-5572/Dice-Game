@@ -453,4 +453,14 @@ if ("serviceWorker" in navigator) {
       console.warn("Service worker registration failed:", err);
     });
   });
+
+  // When a new service worker takes over (i.e. a new deploy), reload once
+  // automatically so the page always ends up running the latest code
+  // instead of requiring a manual hard refresh.
+  let hasReloaded = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (hasReloaded) return;
+    hasReloaded = true;
+    window.location.reload();
+  });
 }
