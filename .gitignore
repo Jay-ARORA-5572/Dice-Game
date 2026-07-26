@@ -26,3 +26,6 @@ yarn-error.log*
 
 # Test / build artifacts
 coverage/
+
+# Capacitor build output (regenerated via: npm run build:capacitor)
+www/
