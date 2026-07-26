@@ -5,7 +5,7 @@
         ".read": true,
 
         "players": {
-          ".write": "auth != null && (!data.parent().child('uids/player1').exists() || auth.uid == data.parent().child('uids/player1').val() || auth.uid == data.parent().child('uids/player2').val())"
+          ".write": "auth != null && (!data.parent().child('uids/player1').exists() || !data.parent().child('uids/player2').exists() || auth.uid == data.parent().child('uids/player1').val() || auth.uid == data.parent().child('uids/player2').val())"
         },
 
         "uids": {
@@ -18,23 +18,23 @@
         },
 
         "turn": {
-          ".write": "auth != null && (auth.uid == root.child('rooms/' + $roomCode + '/uids/player1').val() || auth.uid == root.child('rooms/' + $roomCode + '/uids/player2').val())"
+          ".write": "auth != null && (!root.child('rooms/' + $roomCode + '/uids/player1').exists() || auth.uid == root.child('rooms/' + $roomCode + '/uids/player1').val() || auth.uid == root.child('rooms/' + $roomCode + '/uids/player2').val())"
         },
 
         "rolls": {
-          ".write": "auth != null && (auth.uid == root.child('rooms/' + $roomCode + '/uids/player1').val() || auth.uid == root.child('rooms/' + $roomCode + '/uids/player2').val())"
+          ".write": "auth != null && (!root.child('rooms/' + $roomCode + '/uids/player1').exists() || auth.uid == root.child('rooms/' + $roomCode + '/uids/player1').val() || auth.uid == root.child('rooms/' + $roomCode + '/uids/player2').val())"
         },
 
         "score": {
-          ".write": "auth != null && auth.uid == root.child('rooms/' + $roomCode + '/uids/player1').val()"
+          ".write": "auth != null && (!root.child('rooms/' + $roomCode + '/uids/player1').exists() || auth.uid == root.child('rooms/' + $roomCode + '/uids/player1').val())"
         },
 
         "lastRound": {
-          ".write": "auth != null && auth.uid == root.child('rooms/' + $roomCode + '/uids/player1').val()"
+          ".write": "auth != null && (!root.child('rooms/' + $roomCode + '/uids/player1').exists() || auth.uid == root.child('rooms/' + $roomCode + '/uids/player1').val())"
         },
 
         "matchWinner": {
-          ".write": "auth != null && auth.uid == root.child('rooms/' + $roomCode + '/uids/player1').val()"
+          ".write": "auth != null && (!root.child('rooms/' + $roomCode + '/uids/player1').exists() || auth.uid == root.child('rooms/' + $roomCode + '/uids/player1').val())"
         },
 
         "matchTarget": {
