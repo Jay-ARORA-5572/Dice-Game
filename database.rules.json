@@ -5,6 +5,13 @@
         ".read": true,
         ".write": "auth != null && (!data.exists() || !data.child('uids/player2').exists() || auth.uid == data.child('uids/player1').val() || auth.uid == data.child('uids/player2').val())"
       }
+    },
+    "leaderboard": {
+      ".read": true,
+      "$entryId": {
+        ".write": "auth != null && !data.exists()",
+        ".validate": "newData.hasChildren(['winner', 'score', 'date'])"
+      }
     }
   }
 }

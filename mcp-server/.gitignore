@@ -1,0 +1,9 @@
+node_modules/
+.env
+*.log
+
+# Firebase service account key -- NEVER commit this, unlike the web app's
+# firebase-config.js. This grants full admin access to your database,
+# bypassing all security rules. See ../README.md "Optional: MCP Server".
+serviceAccountKey.json
+*-firebase-adminsdk-*.json

@@ -120,6 +120,57 @@ Until step 3 is done, clicking Create/Join Room shows a friendly reminder instea
 
 **Invite links:** the copied link includes `?room=CODE` — opening it auto-expands the online panel and pre-fills the room code, so joining a friend's game is a single click plus entering a name.
 
+> **Already had online multiplayer working?** `database.rules.json` now also includes a `/leaderboard` node (for the shared leaderboard used by both the web app and the MCP server below) — re-paste the updated file into Firebase's Rules tab and **Publish** again, or matches will complete fine but shared-leaderboard writes will be silently denied.
+
+## Optional: MCP Server (Play Dicee from Claude Desktop / Claude Code)
+
+`mcp-server/` is a [Model Context Protocol](https://modelcontextprotocol.io/) server that exposes Dicee's online multiplayer game as tools — so Claude Desktop or Claude Code can create rooms, roll dice, check state, and read the leaderboard directly. It connects to the **same Firebase project** as the web app's online multiplayer, using the Firebase Admin SDK (a trusted server-side connection, not subject to the browser security rules above).
+
+**Tools exposed:**
+- `create_room` — start a new match, choosing dice count and match length
+- `join_room` — seat a second player in an existing room
+- `roll_dice` — roll for a player; automatically resolves the round once both have rolled
+- `get_room_state` — check players, score, whose turn it is, match winner
+- `play_again` — reset score for a new match in the same room
+- `get_leaderboard` — read recent completed matches (shared across web + MCP)
+
+**Setup:**
+
+1. In your Firebase project: **Project settings (gear icon) → Service accounts → Generate new private key**. This downloads a JSON file — **treat it like a password**; it grants full admin access to your database, bypassing all security rules. Never commit it (already covered by `mcp-server/.gitignore`).
+2. Save that file somewhere on your machine, e.g. `mcp-server/serviceAccountKey.json`.
+3. Install dependencies:
+   ```bash
+   cd mcp-server
+   npm install
+   ```
+4. Copy `.env.example` to `.env` and fill in `FIREBASE_SERVICE_ACCOUNT_PATH` (pointing at the file from step 2) and `FIREBASE_DATABASE_URL` (same value as in `js/firebase-config.js`).
+5. Test it runs: `npm start` should print `Dicee MCP server running on stdio.` (Ctrl+C to stop.)
+6. Add it to Claude Desktop's config (`claude_desktop_config.json` — Claude Desktop → Settings → Developer → Edit Config):
+   ```json
+   {
+     "mcpServers": {
+       "dicee": {
+         "command": "node",
+         "args": ["/absolute/path/to/Dice-Game/mcp-server/index.js"],
+         "env": {
+           "FIREBASE_SERVICE_ACCOUNT_PATH": "/absolute/path/to/serviceAccountKey.json",
+           "FIREBASE_DATABASE_URL": "https://your-project-default-rtdb.region.firebasedatabase.app"
+         }
+       }
+     }
+   }
+   ```
+   (Claude Code: use `claude mcp add` with the same command/args/env — see Claude Code's MCP docs.)
+7. Restart Claude Desktop/Code. Ask it something like *"Create a Dicee room called TestRoom for a player named Ada, then roll for player1"* — it should call the tools directly.
+
+**Testing:** `mcp-server` has its own test suite (Node's built-in test runner, separate from the web app's Vitest suite) covering tool registration and shared game logic:
+```bash
+cd mcp-server
+npm test
+```
+
+**A fun side effect:** because this uses the *same* shared `/leaderboard` and `/rooms` data as the web app, a human playing in the browser and Claude playing via MCP can join the same room and actually play against each other.
+
 ## Tech Stack
 
 - HTML5

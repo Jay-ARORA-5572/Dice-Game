@@ -1,0 +1,20 @@
+{
+  "name": "dicee-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server exposing Dicee's online multiplayer game as tools for Claude Desktop / Claude Code",
+  "type": "module",
+  "main": "index.js",
+  "bin": {
+    "dicee-mcp-server": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "node --test tests/*.test.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "dotenv": "^17.4.2",
+    "firebase-admin": "^14.2.0",
+    "zod": "^3.23.8"
+  }
+}

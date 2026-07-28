@@ -151,3 +151,17 @@ export async function playAgainRoom({ ref, update, db }, roomCode) {
     lastRound: null,
   });
 }
+
+/**
+ * Records a completed match to the shared /leaderboard node (visible to
+ * every player and to the MCP server's get_leaderboard tool) -- distinct
+ * from the per-device localStorage leaderboard the UI also keeps locally.
+ */
+export async function recordSharedLeaderboardEntry({ ref, push, set, db }, { winner, score }) {
+  const entryRef = push(ref(db, "leaderboard"));
+  await set(entryRef, {
+    winner,
+    score,
+    date: new Date().toISOString(),
+  });
+}

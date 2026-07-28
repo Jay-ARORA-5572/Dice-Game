@@ -7,6 +7,7 @@ import {
   submitRoll,
   resolveRound,
   playAgainRoom,
+  recordSharedLeaderboardEntry,
 } from "./multiplayer.js";
 import { renderPlayerLabel } from "./avatar.js";
 
@@ -209,6 +210,15 @@ async function renderRoomState(state) {
     if (!hasSavedThisMatch) {
       hasSavedThisMatch = true;
       saveOnlineMatch(winnerName, state.score.player1, state.score.player2);
+
+      // Only the host writes the shared entry, so a completed match isn't
+      // recorded twice (once per client) in the globally-visible leaderboard.
+      if (localPlayerKey === "player1") {
+        recordSharedLeaderboardEntry(handles, {
+          winner: winnerName,
+          score: `${state.score.player1}-${state.score.player2}`,
+        }).catch((e) => console.warn("Failed to save shared leaderboard entry:", e));
+      }
     }
     return;
   }
