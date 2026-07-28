@@ -59,8 +59,17 @@ Dice-Game/
 ├── assets/
 │   ├── og-image.png                  # Open Graph / social share preview image
 │   └── preview.png                   # README preview screenshot
-└── images/
-    └── dice1.png … dice6.png         # Dice face images
+├── images/
+│   └── dice1.png … dice6.png         # Dice face images
+└── mcp-server/                       # MCP server exposing Dicee as Claude Desktop/Code tools
+    ├── index.js                      # Tool definitions (create_room, roll_dice, etc.)
+    ├── setup-claude-desktop.js       # One-command Claude Desktop config setup
+    ├── lib/
+    │   ├── gameActions.js            # Firebase Admin-backed game logic (reuses js/game-logic.js)
+    │   ├── firebaseAdmin.js          # Service-account Firebase Admin SDK init
+    │   └── desktopConfig.js          # Pure logic for the setup script (tested)
+    ├── tests/                        # Node's built-in test runner (separate from root Vitest)
+    └── .env.example                  # Template for FIREBASE_SERVICE_ACCOUNT_PATH / FIREBASE_DATABASE_URL
 ```
 
 ## How It Works
@@ -145,7 +154,15 @@ Until step 3 is done, clicking Create/Join Room shows a friendly reminder instea
    ```
 4. Copy `.env.example` to `.env` and fill in `FIREBASE_SERVICE_ACCOUNT_PATH` (pointing at the file from step 2) and `FIREBASE_DATABASE_URL` (same value as in `js/firebase-config.js`).
 5. Test it runs: `npm start` should print `Dicee MCP server running on stdio.` (Ctrl+C to stop.)
-6. Add it to Claude Desktop's config (`claude_desktop_config.json` — Claude Desktop → Settings → Developer → Edit Config):
+6. **Claude Desktop:** run the setup script — it writes/merges the config for you, so there's no manual JSON editing and it won't clobber any other MCP servers you've already configured:
+   ```bash
+   npm run setup:desktop
+   ```
+   It validates your `.env` and service account file first and tells you exactly what's missing if something's off. **Claude Code** users: use `claude mcp add` instead, with the same command/args/env shown below — see Claude Code's MCP docs.
+
+   <details>
+   <summary>What the script writes (for reference, or to do it by hand)</summary>
+
    ```json
    {
      "mcpServers": {
@@ -160,10 +177,12 @@ Until step 3 is done, clicking Create/Join Room shows a friendly reminder instea
      }
    }
    ```
-   (Claude Code: use `claude mcp add` with the same command/args/env — see Claude Code's MCP docs.)
-7. Restart Claude Desktop/Code. Ask it something like *"Create a Dicee room called TestRoom for a player named Ada, then roll for player1"* — it should call the tools directly.
+   </details>
+7. **Quit and reopen Claude Desktop completely** (not just close the window) to pick up the change. Ask it something like *"Create a Dicee room called TestRoom for a player named Ada, then roll for player1"* — it should call the tools directly.
 
-**Testing:** `mcp-server` has its own test suite (Node's built-in test runner, separate from the web app's Vitest suite) covering tool registration and shared game logic:
+**What the setup script can't do for you:** getting the service account key requires your own Firebase console access, and restarting Claude Desktop requires your own machine — those two steps are unavoidably manual. Everything else (steps 3, 6) is one command each.
+
+**Testing:** `mcp-server` has its own test suite (Node's built-in test runner, separate from the web app's Vitest suite) covering tool registration, shared game logic, and the setup script's config-merging logic:
 ```bash
 cd mcp-server
 npm test

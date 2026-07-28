@@ -9,6 +9,7 @@
   },
   "scripts": {
     "start": "node index.js",
+    "setup:desktop": "node setup-claude-desktop.js",
     "test": "node --test tests/*.test.js"
   },
   "dependencies": {
