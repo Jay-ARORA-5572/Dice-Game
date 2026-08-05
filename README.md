@@ -133,7 +133,18 @@ Until step 3 is done, clicking Create/Join Room shows a friendly reminder instea
 
 ## Optional: MCP Server (Play Dicee from Claude Desktop / Claude Code)
 
-`mcp-server/` is a [Model Context Protocol](https://modelcontextprotocol.io/) server that exposes Dicee's online multiplayer game as tools — so Claude Desktop or Claude Code can create rooms, roll dice, check state, and read the leaderboard directly. It connects to the **same Firebase project** as the web app's online multiplayer, using the Firebase Admin SDK (a trusted server-side connection, not subject to the browser security rules above).
+`mcp-server/` is a [Model Context Protocol](https://modelcontextprotocol.io/) server that exposes Dicee's online multiplayer game as tools — so Claude Desktop or Claude Code can create rooms, roll dice, check state, and read the leaderboard directly. MCP is a standard way for an AI assistant to call real functions in an external program (rather than you copy-pasting context back and forth) — any MCP-compatible client can use any MCP server without custom integration work per pair.
+
+What makes this implementation more than a toy demo:
+- It drives the **same live Firebase database** as the real web app's online multiplayer — a tool call from Claude and a click from a human browser affect the exact same game state, and a human and an AI could even join the same room and play each other.
+- It reuses `js/game-logic.js` directly (a relative import from `mcp-server/lib/gameActions.js`), so "how a round is won" is provably the same code path for both the browser and the MCP server, not two implementations that could quietly drift apart.
+- It demonstrates two different trust models against one database: the browser goes through the security rules above (anonymous auth, restricted writes), while this server uses the Firebase **Admin SDK** — a trusted local process with a service account that bypasses those rules by design, the same way a backend service normally would.
+
+**What using it actually looks like**, once set up — you'd type something like:
+
+> *"Create a Dicee room called Showdown for a player named Ada with 2 dice per round, then roll for player1, then check the room state."*
+
+and Claude calls `create_room`, then `roll_dice`, then `get_room_state` as real tool invocations, reporting back the actual room code, dice results, and score — not a simulated answer.
 
 **Tools exposed:**
 - `create_room` — start a new match, choosing dice count and match length
